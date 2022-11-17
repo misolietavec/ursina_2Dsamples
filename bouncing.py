@@ -1,4 +1,4 @@
-from ursina import *
+from ursina import Ursina, Entity, color, window, camera
 
 WIDTH = 800
 HEIGHT = 450

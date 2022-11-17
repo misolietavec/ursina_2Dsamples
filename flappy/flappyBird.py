@@ -1,4 +1,5 @@
-from ursina import *
+from ursina import Ursina, Entity, color, window, camera
+from ursina import time, destroy, Sky, Animation
 from random import randint
 from time import sleep
 from threading import Thread
@@ -19,7 +20,8 @@ pipes = []
 def add_pipe(seconds):
     while True:
         y = randint(140, 280)
-        new_bottom = Entity(model='quad', texture='pipe-red', position=(450, 225), 
+        new_bottom = Entity(model='quad', texture='pipe-red', 
+                            position=(450, 225), 
                             scale=(68, 338), collider='cube')
 
         new_top = Entity(model='quad', texture='pipe-green', position=(450, y), 
@@ -45,6 +47,8 @@ def update():
             bird.color=color.brown
             bird.y = -110  # or quit()
             bird.z = 0.2
+
+
 def input(key):
     if key == 'space':
         bird.y = bird.y + 40

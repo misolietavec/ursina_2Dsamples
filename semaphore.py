@@ -1,4 +1,4 @@
-from ursina import *
+from ursina import Ursina, Entity, color, window, camera, Text, Sky
 
 from random import choice
 
@@ -22,12 +22,16 @@ class Semaphore(Entity):
         self.time = 0
         # z=0.01 ensures that lights are nearer to camera than the semrect
         self.semrect = Entity(model='quad', x=0, y=0, z= 1, 
-                              scale=(WIDTH / 5, HEIGHT / 1.3), color=color.light_gray)         
+                              scale=(WIDTH / 5, HEIGHT / 1.3), 
+                              color=color.light_gray)         
         r, o, g = choice(states)
-        self.rl = Entity(model='circle', scale=60, x = 0, y = HEIGHT / 5, color=r)
+        self.rl = Entity(model='circle', scale=60, x = 0, y = HEIGHT / 5, 
+                         color=r)
         self.ol = Entity(model='circle', scale=60, x = 0, y = 0, color=o)
-        self.gl = Entity(model='circle', scale=60, x = 0, y = -HEIGHT / 5, color=g)
-        self.time_text = Text(text='0', scale=2, origin=(0, 0), x=0, y=-0.44, color=color.white)
+        self.gl = Entity(model='circle', scale=60, x = 0, y = -HEIGHT / 5, 
+                         color=g)
+        self.time_text = Text(text='0', scale=2, origin=(0, 0), x=0, y=-0.44, 
+                              color=color.white)
 
 
     def update(self):

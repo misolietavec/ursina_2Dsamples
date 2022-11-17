@@ -1,4 +1,4 @@
-from ursina import *
+from ursina import Ursina, Entity, color, window, camera, mouse, Text, destroy
 from random import randint
 
 NROWS =  10      # numer of brick rows 

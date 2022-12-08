@@ -1,4 +1,5 @@
 # The Bird of Peace :-)
+# Earth image from https://commons.wikimedia.org/wiki/File:Earth_from_Space.jpg
 
 from ursina import Ursina, Entity, Sprite, window, camera, Animation
 import math

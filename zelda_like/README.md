@@ -1,8 +1,11 @@
 ### Zelda-like game in ursina
 
 `zelda.py` is `ursina` version of belove mentioned game 
+`zelda-noOOP.py` -the same, without OOP approach
 
-### For zelda_pgz.py (for Pygame Zero)
+### Pygame Zero version `zelda_pgz.py`
+
+https://github.com/Wireframe-Magazine/Wireframe-61
 
 Projects and assets from Wireframe #61
 

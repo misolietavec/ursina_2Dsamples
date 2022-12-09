@@ -39,6 +39,7 @@ class ZeldaGame(Entity):
             Mons = Sprite("monster_1", x=xm, y=ym, z=-0.1,
                           collider="sphere", visible=False)
             Mons.state = 10
+            Mons.frame = Mons.dx = Mons.dy = 0
             self.monsters.append(Mons)
         self.xtrans = 0   # 0, 16, 32, 48
         self.ytrans = 0   # 0, 10
@@ -83,52 +84,56 @@ class ZeldaGame(Entity):
                     self.monsters[ind].position = (xmt, ymt)
                 else:
                     self.monsters[ind].visible = False
-            if self.Link.x > 400:
-                self.Link.x = -800 + self.Link.x
-            elif self.Link.x < -400:
-                self.Link.x = 800 + self.Link.x
-            if self.Link.y > 200:
-                self.Link.y = -500 + self.Link.y
-            elif self.Link.y < -300:
-                self.Link.y = 500 + self.Link.y
             self.toMove = False
+
+    def testMove(self, Act):
+        ox, oy = Act.x, Act.y
+        cell_x, cell_y = self.in_cell(ox, oy)
+        testx = ox + 25 * Act.dx
+        testy = oy + 25 * Act.dy
+        ncx, ncy = self.in_cell(testx, testy)
+        if str(self.GM[ncx, ncy + 1].texture) != "ground.png":
+            Act.dx = Act.dy = 0
+        else:
+            Act.x = ox + 2 * Act.dx
+            Act.y = oy + 2 * Act.dy
+
+
+    def animActor(self, Act, actname):
+        if Act.dx * Act.dy == 0:
+            num1, num2 = directions[(Act.dx, Act.dy)]
+            num = num1 if Act.frame <= 9 else num2
+            Act.dir = int(num2 // 2) - 1 
+            Act.frame += 1
+            Act.frame = Act.frame % 20
+            Act.texture = f"{actname}_{num}"        
 
     def updateLink(self):
         if self.Link.dx or self.Link.dy:
-            num1, num2 = directions[(self.Link.dx, self.Link.dy)]
-            num = num1 if self.Link.frame <= 9 else num2
-            self.Link.dir = int(num2 // 2) - 1 
-            self.Link.frame += 1
-            self.Link.frame = self.Link.frame % 20
-            self.Link.texture = f"link_{num}"
-            cell_x = int((self.Link.y + 250) // 50) + self.ytrans
-            cell_y = int((self.Link.x + 400) // 50) + self.xtrans
-            ox, oy = self.Link.x, self.Link.y
-            self.Link.x += 25 * self.Link.dx
-            self.Link.y += 25 * self.Link.dy
-            cell_y = int((self.Link.y + 250) // 50) + self.ytrans + 1
-            cell_x = int((self.Link.x + 400) // 50) + self.xtrans
-            if str(self.GM[cell_x, cell_y].texture) != "ground.png":
-                self.Link.x = ox
-                self.Link.y = oy
-                self.Link.dx = self.Link.dy = 0
-            else:
-                self.Link.x = ox + 2 * self.Link.dx
-                self.Link.y = oy + 2 * self.Link.dy
-            if self.Link.x < -400:
-                self.xtrans = max(0, self.xtrans - 16)
-            elif self.Link.x > 400:
-                self.xtrans = min(48, self.xtrans + 16)
-            if self.Link.y < -300:
-                self.ytrans = max(0, self.ytrans - 10)
-            elif self.Link.y > 200:
-                self.ytrans = min(10, self.ytrans + 10)
-            self.toMove = (not (-400 < self.Link.x < 400) or
-                           not (-300 < self.Link.y < 200))
+            self.animActor(self.Link, "link")
+            self.testMove(self.Link)
+            self.moveMap()
             mx = (400 + 50 * self.xtrans + self.Link.x) / 12.5
             my = (300 + 50 * self.ytrans + self.Link.y) / 12.5            
             self.miniLink.x = self.navigation.lbx + mx 
             self.miniLink.y = self.navigation.lby + my               
+
+    def moveMap(self):
+        self.toMove = (not (-400 < self.Link.x < 400) or
+                       not (-300 < self.Link.y < 200))
+        if self.toMove:               
+            if self.Link.x < -400:
+                self.xtrans = max(0, self.xtrans - 16)
+                self.Link.x = 800 + self.Link.x
+            elif self.Link.x > 400:
+                self.xtrans = min(48, self.xtrans + 16)
+                self.Link.x = -800 + self.Link.x
+            if self.Link.y < -300:
+                self.ytrans = max(0, self.ytrans - 10)
+                self.Link.y = 500 + self.Link.y
+            elif self.Link.y > 200:
+                self.ytrans = min(10, self.ytrans + 10)
+                self.Link.y = -500 + self.Link.y
 
     def updateSword(self):
         if self.sword.frame > 0:
@@ -162,12 +167,31 @@ class ZeldaGame(Entity):
                 destroy(Mon)
                 del self.monsters[ind]
                 del monstersXY[ind]
-                
+            if (Mon.state == 10) and Mon.visible:
+                if (Mon.x > self.Link.x + 50):
+                    Mon.dx = -1
+                else:
+                    if (Mon.x < self.Link.x - 50):
+                        Mon.dx = 1
+                if (Mon.y > self.Link.y + 50):
+                    Mon.dy = -1
+                else:
+                    if (Mon.y < self.Link.y - 50):
+                        Mon.dy = 1
+                if Mon.dx or Mon.dy:
+                    self.animActor(Mon, "monster")
+                    self.testMove(Mon)
+
     def update(self):
         self.updateGM()
         self.updateLink()
         self.updateSword()
         self.updateMonsters()
+
+    def in_cell(self, x, y):
+        cell_x = int((x + 400) // 50) + self.xtrans
+        cell_y = int((y + 250) // 50) + self.ytrans
+        return (cell_x, cell_y)
 
 game = ZeldaGame()
 
@@ -182,6 +206,7 @@ def input(key):
         game.sword.x = game.Link.x + 30 * game.sword.dx
         game.sword.y = game.Link.y - 35 * game.sword.dy
         game.sword.visible = True
-
+    if key == "q":
+        quit()
 
 app.run()
